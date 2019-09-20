@@ -26,7 +26,7 @@ class AuthService with ChangeNotifier {
   }) async {}
 
   Future loginUser({String email, String password}) {
-    if (password == Firestore.instance.collection('password')) {
+    if (password == Firestore.instance.collection('users.password').toString()) {
       this.currentUser = {'email': email};
       notifyListeners();
       return Future.value(currentUser);

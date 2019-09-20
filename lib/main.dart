@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -46,12 +47,28 @@ class _LoginPageState extends State<LoginPage> {
   String _password;
   String _email;
 
-  void _login() {
+  void _signup() {
     setState(() {
       final form = _formKey.currentState;
       form.save();
 
       print(form);
+
+      if (form.validate()) {
+        Firestore.instance.runTransaction((transaction) async {
+          await transaction.set(Firestore.instance.collection("users").document(), {
+            'email': _email,
+            'password': _password
+          });
+        });
+      }
+    });
+  }
+
+  void _login() {
+    setState(() {
+      final form = _formKey.currentState;
+      form.save();
 
       if (form.validate()) {
         FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
@@ -101,8 +118,12 @@ class _LoginPageState extends State<LoginPage> {
               ),
                 ButtonBar(children: <Widget>[
                   RaisedButton(
-                    child: Text('next'),
+                    child: Text('Login'),
                     onPressed: _login,
+                  ),
+                  RaisedButton(
+                    child: Text('Signup'),
+                    onPressed: _signup,
                   ),
                 ],
               ),
