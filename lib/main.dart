@@ -23,11 +23,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: FutureBuilder(
-        future: Provider.of<AuthService>(context).getUser(),
+      home: StreamBuilder<FirebaseUser>(
+        stream: FirebaseAuth.instance.onAuthStateChanged,
         builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return snapshot.hasData ? HomePage() : LoginPage();
+          if (snapshot.connectionState == ConnectionState.active) {
+            FirebaseUser user = snapshot.data;
+            if (user == null) {
+              return LoginPage();
+            }
+            return HomePage();
           } else {
             return Container(color: Colors.white);
           }
@@ -55,6 +59,7 @@ class _LoginPageState extends State<LoginPage> {
       print(form);
 
       if (form.validate()) {
+        FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
         Firestore.instance.runTransaction((transaction) async {
           await transaction.set(Firestore.instance.collection("users").document(), {
             'email': _email,
@@ -71,19 +76,13 @@ class _LoginPageState extends State<LoginPage> {
       form.save();
 
       if (form.validate()) {
-        FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
+        FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       body: Container(
         // Center is a layout widget. It takes a single child and positions it
