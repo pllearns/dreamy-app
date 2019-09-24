@@ -9,6 +9,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  bool _visible = false;
+
+  @override 
+  void initState() {
+    super.initState();
+
+    setState(() {
+      _visible = true;
+    });
+  }
+
   void _logout() {
     FirebaseAuth.instance.signOut();
   }
@@ -21,9 +32,22 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Center(
         child: Column(children: <Widget>[
-            Image.asset('assets/images/lucy_for_app.jpg'),
+            AnimatedOpacity(
+              child: Image.asset('assets/images/lucy_for_app.jpg'),
+              opacity: !_visible ? 0.0 : 1.0,
+              duration: Duration(milliseconds: 3000),
+            ), 
             SizedBox(height: 100.0),
             Text('Dream with your crush'),
+            RaisedButton(
+              child: Text('Find Your Dream'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DreamPage()),
+                );
+              },
+            ),
             RaisedButton(
               child: Text('logout'),
               onPressed: _logout,

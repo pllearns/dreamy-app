@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
             if (user == null) {
               return LoginPage();
             }
-            return HomePage();
+              return HomePage();
           } else {
             return Container(color: Colors.white);
           }
